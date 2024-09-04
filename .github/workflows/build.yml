@@ -1,0 +1,43 @@
+name: Build and Update Repository
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Get package list
+        id: get-packages
+        run: |
+          packages=$(ls -d src/*/ | xargs -n 1 basename)
+          echo "packages=$packages" >> $GITHUB_OUTPUT
+
+      - name: Build packages and update repository
+        uses: Slinet6056/archpkg-build@dev
+        with:
+          package_name: ${{ steps.get-packages.outputs.packages }}
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          pkgs_path: src
+          repo_name: slinet
+          repo_path: pkgs
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add pkgs/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update repository" && git push)
+
+      - name: Push LFS objects
+        run: git lfs push --all origin
