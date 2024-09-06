@@ -1,11 +1,11 @@
 pkgname=ttestt
 pkgver=1.0.0
-pkgrel=3
+pkgrel=4
 pkgdesc="test"
 arch=('any')
 depends=('bash')
 source=("test.sh")
-sha256sums=('SKIP')
+sha256sums=('c20768a77532d80ee9985d2f260412c5478980269e5c11a806afb355970b1e63')
 
 package() {
     install -Dm755 "$srcdir/test.sh" "$pkgdir/usr/bin/ttestt"
