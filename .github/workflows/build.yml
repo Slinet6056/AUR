@@ -36,6 +36,10 @@ jobs:
         pkg: ${{ fromJSON(needs.get-changed-packages.outputs.packages) }}
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
       - name: Initialize matrix lock
         if: ${{ matrix.pkg == fromJSON(needs.get-changed-packages.outputs.packages)[0] }}
         uses: rakles/matrix-lock@main
@@ -49,9 +53,9 @@ jobs:
           step: wait
           id: ${{ matrix.pkg }}
 
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
+      - name: Pull latest changes
+        run: |
+          git pull
 
       - name: Build package and update repository
         uses: Slinet6056/archpkg-build@dev
