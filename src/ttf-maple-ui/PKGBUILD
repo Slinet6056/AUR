@@ -1,0 +1,22 @@
+pkgname=ttf-maple-ui
+pkgver=1.0
+pkgrel=1
+pkgdesc="Maple UI Font"
+arch=('any')
+url="https://github.com/subframe7536/maple-font"
+license=('custom')
+depends=()
+makedepends=('wget')
+source=()
+sha256sums=()
+
+prepare() {
+    wget -O "Maple UI Bold.ttf" "https://gh.slinet.me/https://github.com/subframe7536/maple-font/raw/other-resources/cn-resource/maple-ui/Maple%20UI%20Bold.ttf"
+    wget -O "Maple UI.ttf" "https://gh.slinet.me/https://github.com/subframe7536/maple-font/raw/other-resources/cn-resource/maple-ui/Maple%20UI.ttf"
+}
+
+package() {
+    install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+    install -m644 "Maple UI Bold.ttf" "${pkgdir}/usr/share/fonts/TTF/"
+    install -m644 "Maple UI.ttf" "${pkgdir}/usr/share/fonts/TTF/"
+}
