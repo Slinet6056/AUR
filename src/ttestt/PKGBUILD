@@ -1,6 +1,6 @@
 pkgname=ttestt
 pkgver=1.0.0
-pkgrel=5
+pkgrel=6
 pkgdesc="test"
 arch=('any')
 depends=('bash')
