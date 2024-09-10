@@ -1,0 +1,3 @@
+[submodule "src/gss-ntlmssp"]
+	path = src/gss-ntlmssp
+	url = https://aur.archlinux.org/gss-ntlmssp.git
