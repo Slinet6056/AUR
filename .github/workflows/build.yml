@@ -5,6 +5,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
@@ -21,13 +23,22 @@ jobs:
         id: changed-pkgbuilds
         run: |
           git submodule update --init --recursive
-          changed_pkgbuilds=$(git diff --name-only HEAD^ HEAD -- . ':(exclude).gitmodules' | grep 'src/.*/PKGBUILD' || true)
-          submodule_changes=$(git submodule status | awk '{print $2}')
+          git fetch --all
+
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            last_run=$(git log -1 --format=%ct)
+            changed_pkgbuilds=$(git diff --name-only @{${last_run}} HEAD -- . ':(exclude).gitmodules' | grep 'src/.*/PKGBUILD' || true)
+          else
+            changed_pkgbuilds=$(git diff --name-only HEAD^ HEAD -- . ':(exclude).gitmodules' | grep 'src/.*/PKGBUILD' || true)
+          fi
+
+          submodule_changes=$(git submodule foreach --quiet 'git diff --quiet || echo $name')
           for submodule in $submodule_changes; do
             if [[ -f "$submodule/PKGBUILD" ]]; then
               changed_pkgbuilds+=$'\n'"$submodule/PKGBUILD"
             fi
           done
+
           if [ -n "$changed_pkgbuilds" ]; then
             changed_packages=$(echo "$changed_pkgbuilds" | xargs -n1 dirname | xargs -n1 basename | sort -u | jq -R -s -c 'split("\n")[:-1]')
             echo "packages=$changed_packages" >> $GITHUB_OUTPUT
